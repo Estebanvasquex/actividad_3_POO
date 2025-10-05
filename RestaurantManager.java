@@ -6,19 +6,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-class RestaurantManager {
+
+ //Implementa el patrón Singleton. Gestiona el menú, los clientes y las órdenes de forma centralizada.
+
+public final class RestaurantManager {
+    // Instancia única
     private static RestaurantManager instance;
 
     private Map<String, MenuItem> menuItems;
     private Map<String, Customer> customers;
     private Map<String, Order> orders;
 
+    // Constructor privado para evitar instanciación externa
     private RestaurantManager() {
         this.menuItems = new HashMap<>();
         this.customers = new HashMap<>();
         this.orders = new HashMap<>();
     }
-
+     //Devuelve la única instancia de RestaurantManager.
     public static synchronized RestaurantManager getInstance() {
         if (instance == null) {
             instance = new RestaurantManager();
@@ -26,6 +31,7 @@ class RestaurantManager {
         return instance;
     }
 
+    //Gestión de Menú
     public void addMenuItem(MenuItem item) {
         if (item == null) throw new IllegalArgumentException("MenuItem nulo");
         menuItems.put(item.getId(), item);
@@ -39,6 +45,14 @@ class RestaurantManager {
         return Collections.unmodifiableCollection(menuItems.values());
     }
 
+    public List<MenuItem> topNExpensiveMenuItems(int n) {
+        return menuItems.values().stream()
+                .sorted(Comparator.comparingDouble(MenuItem::getPrice).reversed())
+                .limit(n)
+                .collect(Collectors.toList());
+    }
+
+    //Gestión de Clientes
     public void addCustomer(Customer c) {
         if (c == null) throw new IllegalArgumentException("Customer nulo");
         customers.put(c.getId(), c);
@@ -48,6 +62,7 @@ class RestaurantManager {
         return Collections.unmodifiableCollection(customers.values());
     }
 
+    //Gestión de Órdenes
     public void addOrder(Order o) {
         if (o == null) throw new IllegalArgumentException("Order nulo");
         orders.put(o.getId(), o);
@@ -75,12 +90,5 @@ class RestaurantManager {
                 .filter(o -> o.getStatus() == OrderStatus.DELIVERED)
                 .mapToDouble(Order::getTotal)
                 .sum();
-    }
-
-    public List<MenuItem> topNExpensiveMenuItems(int n) {
-        return menuItems.values().stream()
-                .sorted(Comparator.comparingDouble(MenuItem::getPrice).reversed())
-                .limit(n)
-                .collect(Collectors.toList());
     }
 }
