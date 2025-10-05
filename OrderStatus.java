@@ -1,0 +1,3 @@
+enum OrderStatus {
+    PENDING, PREPARING, READY, DELIVERED, CANCELLED
+}
